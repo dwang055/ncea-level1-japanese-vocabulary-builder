@@ -1227,7 +1227,7 @@ footer {
   </div>
 
   <footer>
-    <div class="footer-author">Created by Daniel Wang (dwang055@gmail.com)for NCEA Level 1 Japanese · Based on official 2025 vocabulary list · For educational use · © 2026</div>
+    <div class="footer-author">Created by Daniel Wang (dwang055@gmail.com) for NCEA Level 1 Japanese · Based on official 2025 vocabulary list · For educational use · © 2026</div>
     <div class="footer-quote">“継続は力なり。 (Keizoku wa chikara nari.)”<br>Japanese proverb — 'Persistence leads to power.'</div>
   </footer>
 </div>
@@ -6289,6 +6289,12 @@ const LS = {
 
 let isPlayingAudio = false;
 
+function getBaseWord(word) { if (!word) return word; const idx = word.indexOf('【'); return idx !== -1 ? word.substring(0, idx) : word; }
+function extractAnswer(word) { const bracketIdx = word.indexOf('【'); if (bracketIdx !== -1) { const endIdx = word.indexOf('】', bracketIdx); return word.substring(bracketIdx + 1, endIdx); } return word; }
+
+function isHiraganaKatakana(str) { if (!str) return false; return /^[ぁ-ゟァ-ヺ ー々〆〤]+$/.test(str); }
+
+
 function buildGroups() {
   const n = VOCAB.length;
   const wordsPerGroup = 10;
@@ -6822,27 +6828,24 @@ function renderQuestion() {
     document.getElementById('quizPhase1').style.display = 'block';
     document.getElementById('quizPhase2').style.display = 'none';
 
-    const escaped = entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
-    let sentenceText = (entry.quote_en || '').replace(new RegExp(escaped, 'gi'), '_____');
-    document.getElementById('quizSentence').innerHTML = sentenceText;
+    document.getElementById('quizSentence').innerHTML = entry.word;
     const quizHintDiv = document.createElement('div');
     quizHintDiv.style.cssText = 'font-size: 0.95rem; color: var(--muted); margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--s20); line-height: 1.5;';
-    quizHintDiv.innerHTML = entry.quote_zh || '';
+    quizHintDiv.innerHTML = 'Pick the correct English definition:';
     document.getElementById('quizSentence').parentNode.appendChild(quizHintDiv);
-    document.getElementById('quizSentence').parentNode.appendChild(quizZhDiv);
-
+    
     const group = GROUPS[S.gIdx];
-    const distractors = shuffle(group.map(w => w.word).filter(w => w !== entry.word)).slice(0, 3);
-    const choices = shuffle([entry.word, ...distractors]);
+    const distractors = shuffle(group.filter(w => w.word !== entry.word).map(w => w.def_en)).slice(0, 3);
+    const choices = shuffle([entry.def_en, ...distractors]);
     const labels = ['A', 'B', 'C', 'D'];
     const container = document.getElementById('quizChoices');
     container.innerHTML = '';
-    choices.forEach((word, i) => {
+    choices.forEach((def, i) => {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
-      btn.innerHTML = '<span class="choice-label">' + labels[i] + '</span>' + word;
-      btn.dataset.word = word;
-      btn.addEventListener('click', () => checkAnswer(word, entry.word));
+      btn.innerHTML = '<span class="choice-label">' + labels[i] + '</span>' + def;
+      btn.dataset.word = def;
+      btn.addEventListener('click', () => checkAnswer(def, entry.def_en));
       container.appendChild(btn);
     });
 
@@ -6859,30 +6862,25 @@ function renderQuestion() {
 }
 
 function renderQuizSpell(entry) {
-  const word = entry.word;
-  let sentence = entry.quote_en || '';
-  const escaped = entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
-  sentence = sentence.replace(new RegExp(escaped, 'gi'), '_____');
-  document.getElementById('qSpellSentence').innerHTML = sentence;
+  // Show definition and answer boxes
+  document.getElementById('qSpellSentence').innerHTML = '<strong>Definition:</strong> ' + entry.def_en;
 
+  // Extract the answer based on entry format
+  const word = extractAnswer(entry.word).replace(/-/g, '');
+  
   const boxes = document.getElementById('qSpellBoxes');
   boxes.innerHTML = '';
   for (let i = 0; i < word.length; i++) {
-    if (word[i] === '-') {
-      const sep = document.createElement('div');
-      sep.style.cssText = 'width:10px;display:flex;align-items:center;justify-content:center;color:var(--muted2);font-weight:900;font-size:1.2rem;';
-      sep.textContent = '-';
-      boxes.appendChild(sep);
-    } else {
-      const b = document.createElement('div');
-      b.className = 'spell-box' + (i === 0 ? ' cursor' : '');
-      b.dataset.idx = i;
-      boxes.appendChild(b);
-    }
+    const b = document.createElement('div');
+    b.className = 'spell-box' + (i === 0 ? ' cursor' : '');
+    b.dataset.idx = i;
+    boxes.appendChild(b);
   }
+  
   const inp = document.getElementById('qSpellInput');
   inp.value = '';
   inp.placeholder = word.length + ' letters';
+  
   const fb = document.getElementById('qSpellFeedback');
   fb.style.display = 'none';
   fb.className = 'quiz-feedback';
@@ -6892,52 +6890,43 @@ function renderQuizSpell(entry) {
 
 function updateQSpellBoxes(typed) {
   const entry = S.quiz.questions[S.quiz.qIdx].entry;
-  const word = entry.word.replace(/-/g, '');
-  const t = typed;
-  const allBoxes = document.querySelectorAll('#qSpellBoxes .spell-box');
-  allBoxes.forEach((b, i) => {
-    b.className = 'spell-box';
-    if (i < t.length) { b.textContent = t[i]; b.classList.add('filled'); }
-    else { b.textContent = ''; if (i === t.length) b.classList.add('cursor'); }
-  });
+  const word = extractAnswer(entry.word).replace(/-/g, '');
+  const boxes = document.querySelectorAll('#qSpellBoxes .spell-box');
+  
+  for (let i = 0; i < boxes.length; i++) {
+    if (i < typed.length) {
+      boxes[i].textContent = typed[i];
+      boxes[i].classList.add('filled');
+    } else {
+      boxes[i].textContent = '';
+      boxes[i].classList.remove('filled');
+    }
+  }
+  
+  const firstEmpty = Array.from(boxes).findIndex(b => !b.textContent);
+  document.querySelectorAll('#qSpellBoxes .spell-box').forEach(b => b.classList.remove('cursor'));
+  if (firstEmpty >= 0) {
+    boxes[firstEmpty].classList.add('cursor');
+  }
 }
 
 function checkQuizSpelling() {
+  const typed = document.getElementById('qSpellInput').value.trim();
+  if (!typed) return;
+  
   const entry = S.quiz.questions[S.quiz.qIdx].entry;
-  const word = entry.word.toLowerCase();
-  const typed = document.getElementById('qSpellInput').value.trim().toLowerCase();
-  const fb = document.getElementById('qSpellFeedback');
-  if (!typed) { toast('Type the word first!', ''); return; }
-
-  const allBoxes = document.querySelectorAll('#qSpellBoxes .spell-box');
-  const wordClean = word.replace(/-/g, '');
-  const typedClean = typed.replace(/-/g, '');
-
-  if (typedClean === wordClean) {
-    S.quiz.spellScore++;
-    allBoxes.forEach(b => { b.className = 'spell-box correct'; });
-    fb.className = 'quiz-feedback correct-fb';
-    fb.textContent = '✓ Perfect spelling!';
-    toast('✓ Spelled correctly!', 'good');
+  const word = extractAnswer(entry.word).replace(/-/g, '');
+  const t = typed;
+  
+  if (t === word) {
+    document.getElementById('qSpellFeedback').innerHTML = '✅ Correct!';
+    document.getElementById('qSpellFeedback').className = 'quiz-feedback correct';
+    S.quiz.answered = true;
   } else {
-    const wordArr = wordClean.split('');
-    allBoxes.forEach((b, i) => {
-      b.className = 'spell-box';
-      const ch = typedClean[i] || '';
-      b.textContent = ch || wordArr[i];
-      if (!ch) b.classList.add('wrong');
-      else if (ch === wordArr[i]) b.classList.add('correct');
-      else { b.classList.add('wrong'); b.textContent = ch; }
-    });
-    fb.className = 'quiz-feedback wrong-fb';
-    fb.textContent = '✗ The word is "' + entry.word + '".';
+    document.getElementById('qSpellFeedback').innerHTML = '❌ Not quite. The answer is: <strong>' + word + '</strong>';
+    document.getElementById('qSpellFeedback').className = 'quiz-feedback wrong';
   }
-  fb.style.display = 'block';
-  document.getElementById('qSpellRevealBtn').style.display = 'none';
-  const isLast = S.quiz.qIdx === S.quiz.questions.length - 1;
-  const nextBtn = document.getElementById('quizNextBtn');
-  nextBtn.textContent = isLast ? 'See Results →' : 'Next Word →';
-  nextBtn.style.display = 'inline-block';
+  document.getElementById('qSpellFeedback').style.display = 'block';
 }
 
 function checkAnswer(chosen, correct) {
