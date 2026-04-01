@@ -6812,6 +6812,10 @@ function startQuiz() {
 }
 
 function renderQuestion() {
+  if (!GROUPS.length || !S.quiz || !S.quiz.questions) {
+    console.error('No data available');
+    return;
+  }
   const q = S.quiz;
   const { entry } = q.questions[q.qIdx];
   const total = q.questions.length;
@@ -6829,10 +6833,17 @@ function renderQuestion() {
     document.getElementById('quizPhase2').style.display = 'none';
 
     document.getElementById('quizSentence').innerHTML = entry.word;
+    // Clear previous prompt and add new one
+    const parent = document.getElementById('quizSentence').parentNode;
+    // Remove previous hint if exists
+    const prevHint = parent.querySelector('.quiz-phrase-hint');
+    if (prevHint) prevHint.remove();
+    
     const quizHintDiv = document.createElement('div');
+    quizHintDiv.className = 'quiz-phrase-hint';
     quizHintDiv.style.cssText = 'font-size: 0.95rem; color: var(--muted); margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--s20); line-height: 1.5;';
     quizHintDiv.innerHTML = 'Pick the correct English definition:';
-    document.getElementById('quizSentence').parentNode.appendChild(quizHintDiv);
+    parent.appendChild(quizHintDiv);
     
     const group = GROUPS[S.gIdx];
     const distractors = shuffle(group.filter(w => w.word !== entry.word).map(w => w.def_en)).slice(0, 3);
@@ -6862,6 +6873,7 @@ function renderQuestion() {
 }
 
 function renderQuizSpell(entry) {
+  if (!entry || !GROUPS.length) return;
   // Show definition and answer boxes
   document.getElementById('qSpellSentence').innerHTML = '<strong>Definition:</strong> ' + entry.def_en;
 
@@ -6884,11 +6896,12 @@ function renderQuizSpell(entry) {
   const fb = document.getElementById('qSpellFeedback');
   fb.style.display = 'none';
   fb.className = 'quiz-feedback';
-  document.getElementById('qSpellRevealBtn').style.display = 'block';
+  document.getElementById('qSpellRevealBtn').style.display = 'none';
   updateQSpellBoxes('');
 }
 
 function updateQSpellBoxes(typed) {
+  if (!GROUPS.length || !S.quiz || !S.quiz.questions || S.quiz.qIdx === undefined) return;
   const entry = S.quiz.questions[S.quiz.qIdx].entry;
   const word = extractAnswer(entry.word).replace(/-/g, '');
   const boxes = document.querySelectorAll('#qSpellBoxes .spell-box');
@@ -6911,22 +6924,38 @@ function updateQSpellBoxes(typed) {
 }
 
 function checkQuizSpelling() {
+  if (!GROUPS.length || !S.quiz || !S.quiz.questions || S.quiz.qIdx === undefined) return;
   const typed = document.getElementById('qSpellInput').value.trim();
   if (!typed) return;
   
   const entry = S.quiz.questions[S.quiz.qIdx].entry;
   const word = extractAnswer(entry.word).replace(/-/g, '');
-  const t = typed;
   
-  if (t === word) {
-    document.getElementById('qSpellFeedback').innerHTML = '✅ Correct!';
-    document.getElementById('qSpellFeedback').className = 'quiz-feedback correct';
+  // Normalize both strings for comparison (remove all whitespace, handle invisible chars)
+  const typedNorm = typed.replace(/\s+/g, '').trim();
+  const wordNorm = word.replace(/\s+/g, '').trim();
+  
+  const fb = document.getElementById('qSpellFeedback');
+  
+  if (typedNorm === wordNorm) {
+    fb.innerHTML = '✅ Correct!';
+    fb.className = 'quiz-feedback correct-fb';
     S.quiz.answered = true;
   } else {
-    document.getElementById('qSpellFeedback').innerHTML = '❌ Not quite. The answer is: <strong>' + word + '</strong>';
-    document.getElementById('qSpellFeedback').className = 'quiz-feedback wrong';
+    fb.innerHTML = '❌ Not quite. The answer is: <strong>' + word + '</strong>';
+    fb.className = 'quiz-feedback wrong-fb';
   }
-  document.getElementById('qSpellFeedback').style.display = 'block';
+  fb.style.display = 'block';
+  
+  // Hide reveal button and show Next Word button
+  document.getElementById('qSpellRevealBtn').style.display = 'none';
+  
+  if (S.quiz && S.quiz.questions && S.quiz.qIdx !== undefined) {
+    const isLast = S.quiz.qIdx === S.quiz.questions.length - 1;
+    const nextBtn = document.getElementById('quizNextBtn');
+    nextBtn.textContent = isLast ? 'See Results →' : 'Next Word →';
+    nextBtn.style.display = 'inline-block';
+  }
 }
 
 function checkAnswer(chosen, correct) {
@@ -7038,7 +7067,7 @@ function checkSpelling() {
       else              { b.classList.add('wrong'); b.textContent = ch; }
     });
     fb.className = 'spell-feedback err';
-    fb.textContent = '✗ Not quite. The word is "' + entry.word + '".';
+    fb.textContent = '✗ Not quite. The word is "' + word + '".';
   }
   fb.style.display = 'block';
   document.getElementById('spellRevealBtn').style.display = 'none';
@@ -7094,21 +7123,7 @@ document.getElementById('qSpellInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); checkQuizSpelling(); }
 });
 document.getElementById('qSpellCheckBtn').addEventListener('click', checkQuizSpelling);
-document.getElementById('qSpellRevealBtn').addEventListener('click', () => {
-  const entry = S.quiz.questions[S.quiz.qIdx].entry;
-  const fb = document.getElementById('qSpellFeedback');
-  fb.className = 'quiz-feedback wrong-fb';
-  fb.textContent = 'The word is "' + entry.word + '". Try again next time!';
-  fb.style.display = 'block';
-  document.getElementById('qSpellRevealBtn').style.display = 'none';
-  const allBoxes = document.querySelectorAll('#qSpellBoxes .spell-box');
-  const wordClean = entry.word.toLowerCase().replace(/-/g,'');
-  allBoxes.forEach((b, i) => { b.className = 'spell-box wrong'; b.textContent = wordClean[i] || ''; });
-  const isLast = S.quiz.qIdx === S.quiz.questions.length - 1;
-  const nextBtn = document.getElementById('quizNextBtn');
-  nextBtn.textContent = isLast ? 'See Results →' : 'Next Word →';
-  nextBtn.style.display = 'inline-block';
-});
+
 document.getElementById('quizNextBtn').addEventListener('click', quizNext);
 document.getElementById('quizRetryBtn').addEventListener('click', () => {
   document.getElementById('quizResult').style.display = 'none';
