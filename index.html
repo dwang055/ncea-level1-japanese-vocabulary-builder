@@ -1021,9 +1021,333 @@ footer {
   cursor: not-allowed;
 }
 
+/* THEME TOGGLE BUTTON */
+.theme-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(122,208,224,.15);
+  border: 1px solid rgba(122,208,224,.5);
+  color: #6ef7c8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle-btn:hover {
+  background: rgba(122,208,224,.25);
+  border-color: rgba(122,208,224,.8);
+  transform: scale(1.1);
+}
+
+/* LIGHT MODE - FULL UI (improved contrast) */
+body[data-theme="light"] {
+  background: #f8f6f1 !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .book-app,
+body[data-theme="light"] .app-container,
+body[data-theme="light"] .creator-wrap {
+  background: #f8f6f1 !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .book-header,
+body[data-theme="light"] .book-title,
+body[data-theme="light"] .tab-content,
+body[data-theme="light"] .section,
+body[data-theme="light"] .card,
+body[data-theme="light"] .panel {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] h1,
+body[data-theme="light"] h2,
+body[data-theme="light"] h3,
+body[data-theme="light"] .book-header h1 {
+  color: #1e7a2f !important;
+  text-shadow: 0 0 22px rgba(30,122,47,.12) !important;
+}
+body[data-theme="light"] p,
+body[data-theme="light"] .tagline,
+body[data-theme="light"] .description {
+  color: #2c2c2c !important;
+}
+body[data-theme="light"] input,
+body[data-theme="light"] textarea,
+body[data-theme="light"] select {
+  background: #f4f2eb !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] input:focus,
+body[data-theme="light"] textarea:focus,
+body[data-theme="light"] select:focus {
+  border-color: #1e7a2f !important;
+  background: #f0f4f0 !important;
+  box-shadow: 0 0 0 3px rgba(30,122,47,.15) !important;
+}
+body[data-theme="light"] button,
+body[data-theme="light"] .btn {
+  background: rgba(30,122,47,.13) !important;
+  border-color: rgba(30,122,47,.5) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] button:hover,
+body[data-theme="light"] .btn:hover {
+  background: rgba(30,122,47,.24) !important;
+}
+body[data-theme="light"] .theme-toggle-btn {
+  background: rgba(44,102,73,.12) !important;
+  border-color: rgba(44,102,73,.45) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .theme-toggle-btn:hover {
+  background: rgba(44,102,73,.25) !important;
+  transform: scale(1.08);
+}
+body[data-theme="light"] .tab-btn {
+  border-color: #e2e7df !important;
+  color: #4a4a4a !important;
+}
+body[data-theme="light"] .tab-btn.active {
+  background: rgba(30,122,47,.09) !important;
+  border-bottom-color: #1e7a2f !important;
+  color: #1e7a2f !important;
+}
+/* Word cards and flashcards – light background, dark text */
+body[data-theme="light"] .word-card,
+body[data-theme="light"] .flashcard,
+body[data-theme="light"] .flip-card,
+body[data-theme="light"] .flashcard-inner,
+body[data-theme="light"] .word-card-top,
+body[data-theme="light"] .definition-block,
+body[data-theme="light"] .sentence-tab-row,
+body[data-theme="light"] .sentence-content,
+body[data-theme="light"] .my-sentences-block {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .word-display {
+  color: #0d0d0d !important;
+  text-shadow: none !important;
+}
+body[data-theme="light"] .pron-text,
+body[data-theme="light"] .pron-row {
+  color: #3a3a3a !important;
+}
+body[data-theme="light"] .def-en {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .def-zh {
+  color: #3a3a3a !important;
+}
+body[data-theme="light"] .sent-en {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .sent-zh {
+  color: #3a3a3a !important;
+}
+body[data-theme="light"] .synan-block,
+body[data-theme="light"] .synan-group {
+  background: #faf9f5 !important;
+  border-color: #e2e7df !important;
+}
+body[data-theme="light"] .synan-chips {
+  background: transparent !important;
+}
+body[data-theme="light"] .synan-chip.syn {
+  background: rgba(30,122,47,.12) !important;
+  border-color: rgba(30,122,47,.4) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .synan-chip.ant {
+  background: rgba(200,40,40,.12) !important;
+  border-color: rgba(200,40,40,.4) !important;
+  color: #c02828 !important;
+}
+body[data-theme="light"] .alert,
+body[data-theme="light"] .alert-success {
+  background: rgba(30,122,47,.10) !important;
+  border-color: rgba(30,122,47,.40) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] code,
+body[data-theme="light"] pre {
+  background: #f4f2eb !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+/* Flashcard specific overrides */
+body[data-theme="light"] .flashcard-container .flashcard-inner {
+  background: linear-gradient(160deg, #ffffff, #f8f8f8) !important;
+  border: 1px solid #d0d5cc !important;
+  color: #1a1a1a !important;
+  text-align: center !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-word-main {
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-pro {
+  color: #3a3a3a !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-pos {
+  background: rgba(30,122,47,.1) !important;
+  border-color: rgba(30,122,47,.3) !important;
+  color: #0a3d1f !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-def-en {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-def-zh {
+  color: #3a3a3a !important;
+}
+body[data-theme="light"] .flashcard-container .flashcard-hear {
+  background: rgba(30,122,47,.15) !important;
+  border-color: rgba(30,122,47,.6) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .flashcard-pos-display {
+  color: #0a3d1f !important;
+  background: rgba(30,122,47,.12) !important;
+  border-color: rgba(30,122,47,.4) !important;
+}
+body[data-theme="light"] .group-nav {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .group-label,
+body[data-theme="light"] .group-num,
+body[data-theme="light"] .group-dots {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .quiz-section {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .quiz-header,
+body[data-theme="light"] .quiz-body {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .quiz-title,
+body[data-theme="light"] .quiz-subtitle,
+body[data-theme="light"] .quiz-start-desc {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .quiz-sentence {
+  color: #1a1a1a !important;
+  background: #f4f2eb !important;
+  border-color: #d0d5cc !important;
+}
+body[data-theme="light"] .choice-btn {
+  color: #1a1a1a !important;
+  background: #f4f2eb !important;
+  border-color: #d0d5cc !important;
+}
+body[data-theme="light"] .choice-btn:hover:not(:disabled) {
+  background: #eae7dc !important;
+  border-color: #1e7a2f !important;
+}
+body[data-theme="light"] .choice-label {
+  background: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .blank {
+  color: #b8860b !important;
+}
+body[data-theme="light"] .quiz-feedback {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .spell-sentence {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .spell-sentence .hl {
+  color: #b8860b !important;
+}
+body[data-theme="light"] .spell-box {
+  background: #ffffff !important;
+  border-color: #8d8d8d !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .spell-box.filled {
+  border-color: #4a7d99 !important;
+  background: #e6f2f7 !important;
+  color: #1a4d6d !important;
+}
+body[data-theme="light"] .spell-box.correct {
+  border-color: #1e7a2f !important;
+  background: #e6f9f0 !important;
+  color: #0a3d1f !important;
+}
+body[data-theme="light"] .spell-box.wrong {
+  border-color: #c94050 !important;
+  background: #ffe6ec !important;
+  color: #a01828 !important;
+}
+body[data-theme="light"] .quiz-subtitle,
+body[data-theme="light"] .quiz-toggle-icon {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .my-sent-title {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .my-sent-counter {
+  color: #54615a !important;
+  background: #f4f2eb !important;
+  border-color: #d0d5cc !important;
+}
+body[data-theme="light"] .my-sent-input {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .my-sent-input::placeholder {
+  color: #7f8a82 !important;
+}
+body[data-theme="light"] .synan-label {
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .badge.badge-pos {
+  background: rgba(30,122,47,.15) !important;
+  border-color: rgba(30,122,47,.4) !important;
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .flashcard-pos {
+  color: #1e7a2f !important;
+}
+body[data-theme="light"] .starred-section {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .starred-header,
+body[data-theme="light"] .starred-body,
+body[data-theme="light"] .starred-quiz-wrap {
+  background: #ffffff !important;
+  border-color: #d0d5cc !important;
+  color: #1a1a1a !important;
+}
+body[data-theme="light"] .starred-title,
+body[data-theme="light"] .starred-count,
+body[data-theme="light"] .sq-desc {
+  color: #1a1a1a !important;
+}
 </style>
 </head>
 <body>
+<button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">🌙</button>
+
 
 <div id="toast"></div>
 
@@ -1155,7 +1479,7 @@ footer {
         <div class="quiz-q-num" id="quizQNum">Question 1 / 10</div>
 
         <div id="quizPhase1">
-          <div class="quiz-phase-label">📖 Choose the word — Orwell's sentence</div>
+          <div class="quiz-phase-label">📖 Choose the word</div>
           <div class="quiz-sentence" id="quizSentence">—</div>
           <div class="quiz-choices" id="quizChoices"></div>
           <div class="quiz-feedback" id="quizFeedback"></div>
@@ -6492,7 +6816,7 @@ function render() {
   } else {
     sentEn = highlightWord(entry.ex_en, entry.word);
     sentZh = entry.ex_zh;
-    sentSource = '— AI Example · Thematically aligned with <em>' + BOOK_CONFIG.bookName + '</em>';
+    sentSource = '— Thematically aligned with <em>' + BOOK_CONFIG.bookName + '</em>';
   }
   document.getElementById('sentEn').innerHTML = sentEn;
   document.getElementById('sentZh').textContent = sentZh;
@@ -7402,7 +7726,7 @@ function toggleFlashcard() {
     inner.style.background = 'linear-gradient(160deg, rgba(26,74,112,.85), rgba(14,34,48,.95))';
   } else if (flashcardState.side === 'def-en') {
     flashcardState.side = 'def-zh';
-    label.textContent = 'Chinese Definition';
+    label.textContent = 'Collocations';
     const pos2 = entry.part_of_speech || entry.pos || 'word';
     content.innerHTML = '<span class="flashcard-pos">[' + pos2 + ']</span>' + entry.def_zh;
     content.className = 'flashcard-content flashcard-def-zh';
@@ -7502,5 +7826,36 @@ if (VOCAB.length > 1) {
     </div>
   </div>
 </div>
+<script>document.addEventListener("DOMContentLoaded", function() {
+  try {
+    var themeToggle = document.getElementById("themeToggle");
+    if (!themeToggle) {
+      console.warn("Theme toggle button not found in DOM");
+      return;
+    }
+    var html = document.documentElement;
+    var savedTheme = localStorage.getItem("wtt_app_theme") || "dark";
+    function applyTheme(theme) {
+      if (theme === "light") {
+        html.setAttribute("data-theme", "light");
+        document.body.setAttribute("data-theme", "light");
+        themeToggle.textContent = "☀️";
+        localStorage.setItem("wtt_app_theme", "light");
+      } else {
+        html.removeAttribute("data-theme");
+        document.body.removeAttribute("data-theme");
+        themeToggle.textContent = "🌙";
+        localStorage.setItem("wtt_app_theme", "dark");
+      }
+    }
+    applyTheme(savedTheme);
+    themeToggle.addEventListener("click", function(e) {
+      e.preventDefault();
+      var current = html.getAttribute("data-theme") || "dark";
+      applyTheme(current === "light" ? "dark" : "light");
+    });
+  } catch(e) { console.warn("Theme toggle error:", e); }
+});
+</script>
 </body>
 </html>
