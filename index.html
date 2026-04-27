@@ -1344,7 +1344,40 @@ body[data-theme="light"] .sq-desc {
   color: #1a1a1a !important;
 }
 </style>
-</head>
+<style>
+#nibbleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; max-height: 400px; overflow-y: auto; }
+.nibble-word-tile { background: rgba(122,208,224,0.08); border: 1.5px solid rgba(122,208,224,0.3); border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; font-weight: 700; font-size: 1.1rem; color: #e7fbff; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+.nibble-word-tile:hover { background: rgba(122,208,224,0.15); border-color: rgba(122,208,224,0.6); }
+.nibble-word-tile.nibbled { background: rgba(100,100,100,0.2); border-color: rgba(100,100,100,0.4); opacity: 0.6; text-decoration: line-through; color: #888; }
+#nibbleModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.72); z-index: 9999; overflow-y: auto; padding: 20px; }
+#nibbleModal.active { display: flex; align-items: center; justify-content: center; }
+.nibble-modal-content { background: var(--panel); border: 1px solid rgba(122,208,224,0.25); border-radius: 16px; padding: 28px; max-width: 620px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.nibble-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(122,208,224,0.2); padding-bottom: 16px; }
+#nibbleModalTitle { color: #6ef7c8; margin: 0; font-size: 1.15rem; font-weight: 800; }
+#closeNibbleModal { background: none; border: none; color: #9fd6df; font-size: 1.4rem; cursor: pointer; padding: 0; width: 32px; height: 32px; }
+#closeNibbleModal:hover { color: #6ef7c8; }
+#nibbleGroupSelect { width: 100%; padding: 9px 12px; background: rgba(122,208,224,0.06); border: 1px solid rgba(122,208,224,0.3); border-radius: 10px; color: #e7fbff; font-size: 0.9rem; margin-bottom: 20px; }
+.nibble-progress-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 12px; background: rgba(110,247,200,0.08); border: 1px solid rgba(110,247,200,0.25); border-radius: 10px; }
+.nibble-progress-track { flex: 1; height: 6px; background: rgba(122,208,224,0.2); border-radius: 3px; }
+#nibbleModalProgress { height: 100%; background: #6ef7c8; width: 0%; }
+.nibble-progress-text { font-size: 0.8rem; color: #6ef7c8; }
+.nibble-modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.nibble-modal-footer button { padding: 8px 16px; background: rgba(110,247,200,0.15); border: 1px solid rgba(110,247,200,0.5); color: #6ef7c8; border-radius: 8px; cursor: pointer; }
+.header-badge { padding: 8px 16px; background: rgba(110,247,200,0.1); border: 1px solid rgba(110,247,200,0.4); color: #6ef7c8; border-radius: 999px; font-weight: 700; cursor: pointer; font-size: 0.85rem; margin-left: 12px; }
+.header-badge:hover { background: rgba(110,247,200,0.2); }
+body[data-theme="light"] #nibbleModal { background: rgba(255,255,255,0.98) !important; }
+body[data-theme="light"] .nibble-modal-content { background: #ffffff !important; border-color: #d0d5cc !important; }
+body[data-theme="light"] #nibbleModalTitle { color: #1e7a2f !important; }
+body[data-theme="light"] #closeNibbleModal { color: #666 !important; }
+body[data-theme="light"] #nibbleGroupSelect { background: #f4f2eb !important; border-color: #d0d5cc !important; color: #1a1a1a !important; }
+body[data-theme="light"] .nibble-word-tile { background: #f4f2eb !important; border-color: #d0d5cc !important; color: #1a1a1a !important; }
+body[data-theme="light"] .nibble-word-tile:hover { background: #e8e6df !important; }
+body[data-theme="light"] .nibble-word-tile.nibbled { background: #d9d7d0 !important; color: #666 !important; }
+body[data-theme="light"] .nibble-progress-bar { background: rgba(30,122,47,0.08) !important; border-color: #d0d5cc !important; }
+body[data-theme="light"] #nibbleModalProgress { background: #1e7a2f !important; }
+body[data-theme="light"] .nibble-progress-text { color: #1e7a2f !important; }
+body[data-theme="light"] .header-badge { background: rgba(30,122,47,0.1) !important; color: #1e7a2f !important; }
+</style></head>
 <body>
 <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">🌙</button>
 
@@ -7856,6 +7889,79 @@ if (VOCAB.length > 1) {
     });
   } catch(e) { console.warn("Theme toggle error:", e); }
 });
+
+let nibbled = new Set();
+function loadNibbled() { try { nibbled = new Set(JSON.parse(LS.get('wtt_nibbled', '[]'))); } catch(e) {} }
+function saveNibbled() { try { LS.set('wtt_nibbled', JSON.stringify([...nibbled])); } catch(e) {} }
+function closeNibbleModal() { document.getElementById('nibbleModal').classList.remove('active'); }
+function openNibbleModal(mode) {
+  loadNibbled();
+  const modal = document.getElementById('nibbleModal');
+  const sel = document.getElementById('nibbleGroupSelect');
+  if (sel) {
+    sel.innerHTML = '';
+    for (let i = 0; i < NUM_GROUPS; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = 'Group ' + (i+1) + ' (' + (GROUPS[i]?.length || 0) + ')';
+      sel.appendChild(opt);
+    }
+    sel.value = S.gIdx;
+  }
+  renderNibbleGrid(S.gIdx, mode === 'nibbled-list');
+  modal.classList.add('active');
+}
+function renderNibbleGrid(idx, onlyNibbled) {
+  const grid = document.getElementById('nibbleGrid');
+  const group = GROUPS[idx] || [];
+  if (!grid) return;
+  grid.innerHTML = '';
+  const words = onlyNibbled ? group.filter(w => nibbled.has(w.word)) : group;
+  const total = group.length;
+  const count = group.filter(w => nibbled.has(w.word)).length;
+  document.getElementById('nibbleModalProgress').style.width = (total > 0 ? (count/total)*100 : 0) + '%';
+  document.getElementById('nibbleProgressNum').textContent = count;
+  document.getElementById('nibbleProgressTotal').textContent = total;
+  words.forEach(entry => {
+    const card = document.createElement('div');
+    card.className = 'nibble-word-tile' + (nibbled.has(entry.word) ? ' nibbled' : '');
+    card.textContent = entry.word;
+    card.onclick = function() {
+      nibbled.has(entry.word) ? nibbled.delete(entry.word) : nibbled.add(entry.word);
+      saveNibbled();
+      renderNibbleGrid(idx, onlyNibbled);
+    };
+    grid.appendChild(card);
+  });
+}
+function initNibbling() {
+  const quiz = document.querySelector('.quiz-header');
+  const star = document.querySelector('.starred-header');
+  if (quiz && !document.getElementById('nibBtn1')) {
+    const btn = document.createElement('button');
+    btn.id = 'nibBtn1';
+    btn.className = 'header-badge';
+    btn.textContent = '🍴 Nibbling';
+    btn.onclick = () => openNibbleModal('nibbling');
+    quiz.appendChild(btn);
+  }
+  if (star && !document.getElementById('nibBtn2')) {
+    const btn = document.createElement('button');
+    btn.id = 'nibBtn2';
+    btn.className = 'header-badge';
+    btn.textContent = '🍽️ Nibbled';
+    btn.onclick = () => openNibbleModal('nibbled-list');
+    star.appendChild(btn);
+  }
+  const close = document.getElementById('closeNibbleModal');
+  if (close) close.onclick = closeNibbleModal;
+  const sel = document.getElementById('nibbleGroupSelect');
+  if (sel) sel.onchange = () => renderNibbleGrid(parseInt(sel.value), false);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeNibbleModal();
+  });
+}
+setTimeout(initNibbling, 500);
 </script>
-</body>
+<div id="nibbleModal"><div class="nibble-modal-content"><div class="nibble-modal-header"><h3 id="nibbleModalTitle">Nibbling</h3><button id="closeNibbleModal">×</button></div><select id="nibbleGroupSelect"></select><div class="nibble-progress-bar"><div id="nibbleModalProgress" style="width:0%"></div><span class="nibble-progress-text"><span id="nibbleProgressNum">0</span>/<span id="nibbleProgressTotal">0</span></span></div><div id="nibbleGrid"></div><div class="nibble-modal-footer"><button onclick="closeNibbleModal()">Close</button></div></div></div></body>
 </html>
